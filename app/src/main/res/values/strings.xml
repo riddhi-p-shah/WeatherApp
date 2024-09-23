@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">WeatherForecast</string>
+    <string name="wind">"Wind"</string>
+    <string name="humidity">"Humidity"</string>
+    <string name="sunrise">"Sunrise"</string>
+    <string name="sunset">"Sunset"</string>
+    <string name="rain">"Rain"</string>
+    <string name="snow">"Snow"</string>
+    <string name="search_for_city">"Search for a US city"</string>
+    <string name="loading_message">"Loading..."</string>
+
+
+</resources>
