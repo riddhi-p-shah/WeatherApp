@@ -37,6 +37,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             WeatherForecastTheme {
+                //Using a Scaffold to provide a basic layout structure
+                // and WeatherForecastTheme for consistent styling.
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
@@ -47,9 +49,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/**
+ * The main composable function for the Weather Forecast application.
+ * This function uses Jetpack Navigation to manage different screens within the application.
+ */
 @Composable
 fun WeatherApp(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
+    // Defines the navigation host with the initial screen and animations.
     NavHost(navController = navController, startDestination = "home",
         enterTransition = {
             fadeIn(
@@ -86,6 +93,7 @@ fun WeatherApp(modifier: Modifier = Modifier) {
             val screenReturnedState =
                 entry.savedStateHandle.getStateFlow(Constants.SELECTED_LOCATION, false)
 
+            //the "home" screen composable with its route, animations,
             HomeScreen(
                 modifier = modifier,
                 isScreenReturned = screenReturnedState.value ?: false,
@@ -99,6 +107,9 @@ fun WeatherApp(modifier: Modifier = Modifier) {
             exitTransition = noExitTransition
         )
         {
+            ///The search screen composable with its route, animations,
+            // onBack callback for navigation, and onSelect callback for handling
+            // user selection of a location.
             SearchScreen(modifier = modifier, onBack = {
                 navController.popBackStack()
             }) { geoCodeModel ->

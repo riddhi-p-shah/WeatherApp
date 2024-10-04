@@ -38,6 +38,14 @@ import com.riddhi.weatherforecast.api.ApiState
 import com.riddhi.weatherforecast.models.GeoCodeModel
 import com.riddhi.weatherforecast.viewmodels.SearchViewModel
 
+/**
+ * This composable displays the search screen and allows selecting a city location.
+ *
+ * @param modifier The modifier for the composable.
+ * @param onBack The callback function to be called when the back button is clicked.
+ * @param onSelectLocation The callback function to be called when a location is selected.
+ *
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
@@ -46,13 +54,18 @@ fun SearchScreen(
     onSelectLocation: (GeoCodeModel) -> Unit,
 ) {
 
+    // Create a SearchViewModel instance
     val searchViewModel: SearchViewModel = hiltViewModel()
+
+    // Observe the geo API state
     val geoApiState = searchViewModel.geoApiState.collectAsState()
 
+    // Store the search query in a mutable state variable
     var searchQuery by remember {
         mutableStateOf("")
     }
 
+    // Create a FocusRequester to request the focus on the TextField
     val focusRequester = remember { FocusRequester() }
     Column(
         modifier = modifier
@@ -66,6 +79,7 @@ fun SearchScreen(
             .background(Color.White),
             value = searchQuery,
             onValueChange = {
+                // Update the search query and fetch suggestions
                 searchQuery = it
                 searchViewModel.getSuggestions(it)
             },
@@ -84,6 +98,7 @@ fun SearchScreen(
                 )
             })
 
+        // Display content based on the API state
         when (geoApiState.value) {
             is ApiState.Error -> {
                 val message = (geoApiState.value as ApiState.Error).message
@@ -128,6 +143,12 @@ fun SearchScreen(
     }
 }
 
+/**
+ * Displays a suggestion item in the search results list.
+ *
+ * @param suggestion The geocode suggestion to display.
+ * @param onSelect The callback function to be called when the item is selected.
+ */
 @Composable
 fun SuggestionItem(suggestion: GeoCodeModel, onSelect: () -> Unit = {}) {
     Row(

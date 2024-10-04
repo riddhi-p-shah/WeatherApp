@@ -53,15 +53,28 @@ import com.riddhi.weatherforecast.R
 import com.riddhi.weatherforecast.api.ApiState
 import com.riddhi.weatherforecast.utils.Utils
 
+/**
+ * Displays the home screen of the weather forecast app
+ *
+ * @param modifier The modifier for the composable.
+ * @param onSearchClick Callback function to trigger when clicked on searchbar
+ * @param isScreenReturned Flag to trigger weather fetch on screen return
+ */
+
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     onSearchClick: () -> Unit,
     isScreenReturned: Boolean = false
 ) {
+
+    // Get the HomeViewModel instance using hiltViewModel
     val homeScreenViewModel: HomeViewModel = hiltViewModel()
+
+    // Observe the weather API state using collectAsState
     val weatherApiState = homeScreenViewModel.weatherApiState.collectAsState()
 
+    // Define callbacks for permission handling
     val onPermissionGranted = {
         homeScreenViewModel.permissionGranted = true
         homeScreenViewModel.getLastUserLocation()
@@ -77,18 +90,24 @@ fun HomeScreen(
         homeScreenViewModel.message.value = "Please allow location permission"
     }
 
+    // Request location permissions using RequestLocationPermission composable
     RequestLocationPermission(
         onPermissionGranted = onPermissionGranted,
         onPermissionDenied = onPermissionDenied,
         onPermissionsRevoked = onPermissionsRevoked
     )
 
+    // LaunchedEffect to fetch weather data when the screen returns to foreground
     LaunchedEffect(key1 = isScreenReturned) {
         homeScreenViewModel.getWeather()
     }
 
+    // Column layout for the entire screen content
     Column(modifier = modifier.fillMaxWidth()) {
+        // Search component for searching by city (currently disabled)
         SearchComponent(onSearchClick = onSearchClick)
+
+        // Display weather information based on the weatherApiState
         when (weatherApiState.value) {
             is ApiState.Error -> {
                 val message = (weatherApiState.value as ApiState.Error).message
@@ -116,6 +135,12 @@ fun HomeScreen(
     }
 }
 
+/**
+ * Displays a card containing weather information.
+ *
+ * @param modifier The modifier for the composable.
+ * @param weatherData The weather data to display.
+ */
 @Composable
 fun WeatherDataComponent(modifier: Modifier = Modifier, weatherData: WeatherResponseModel?) {
     Column(
@@ -149,7 +174,7 @@ fun WeatherDataComponent(modifier: Modifier = Modifier, weatherData: WeatherResp
                 imagePainter = painterResource(id = R.drawable.sunrise),
                 value = Utils.get12hFormattedTime(
                     weatherData?.sys?.sunrise,
-                    timezoneOffsetHours = weatherData?.timezone ?: 0
+                    timezoneOffsetSeconds = weatherData?.timezone ?: 0
                 )
                     ?: "06:00 AM"
             )
@@ -160,7 +185,7 @@ fun WeatherDataComponent(modifier: Modifier = Modifier, weatherData: WeatherResp
                 imagePainter = painterResource(id = R.drawable.sunset),
                 value = Utils.get12hFormattedTime(
                     weatherData?.sys?.sunset,
-                    timezoneOffsetHours = weatherData?.timezone ?: 0
+                    timezoneOffsetSeconds = weatherData?.timezone ?: 0
                 )
                     ?: "06:00 PM"
             )
@@ -185,7 +210,11 @@ fun WeatherDataComponent(modifier: Modifier = Modifier, weatherData: WeatherResp
 }
 
 
-
+/**
+ * Composable that displays a disabled TextField for searching for a city.
+ *
+ * @param onSearchClick The callback function to be called when the TextField is clicked.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchComponent(onSearchClick: () -> Unit) {
@@ -207,6 +236,14 @@ fun SearchComponent(onSearchClick: () -> Unit) {
     )
 }
 
+/**
+ * Displays a card containing a title, value, and an image.
+ *
+ * @param modifier The modifier for the composable.
+ * @param title The title to display.
+ * @param value The value to display.
+ * @param imagePainter The painter for the image.
+ */
 @Composable
 fun DataCard(modifier: Modifier = Modifier, title: String, value: String, imagePainter: Painter) {
     Card(modifier = modifier.fillMaxWidth()) {
@@ -230,6 +267,12 @@ fun DataCard(modifier: Modifier = Modifier, title: String, value: String, imageP
     }
 }
 
+/**
+ * Displays a card containing weather information.
+ *
+ * @param modifier The modifier for the composable.
+ * @param weatherData The weather data to display.
+ */
 @Composable
 fun WeatherCard(modifier: Modifier = Modifier, weatherData: WeatherResponseModel?) {
     Card(modifier = modifier.fillMaxWidth()) {
@@ -258,6 +301,12 @@ fun WeatherCard(modifier: Modifier = Modifier, weatherData: WeatherResponseModel
 
 }
 
+/**
+ * Displays a title text.
+ *
+ * @param modifier The modifier for the composable.
+ * @param title The title text.
+ */
 @Composable
 fun TitleComponent(modifier: Modifier = Modifier, title: String) {
     Text(
@@ -268,6 +317,12 @@ fun TitleComponent(modifier: Modifier = Modifier, title: String) {
     )
 }
 
+/**
+ * Displays temperature information.
+ *
+ * @param modifier The modifier for the composable.
+ * @param main The main weather data.
+ */
 @Composable
 fun TemperatureComponent(modifier: Modifier = Modifier, main: Main?) {
     Column(
@@ -296,6 +351,12 @@ fun TemperatureComponent(modifier: Modifier = Modifier, main: Main?) {
     }
 }
 
+/**
+ * Displays weather information, including a description and an icon.
+ *
+ * @param modifier The modifier for the composable.
+ * @param weather The weather data.
+ */
 @Composable
 fun WeatherComponent(modifier: Modifier = Modifier, weather: Weather?) {
     Column(
@@ -321,6 +382,13 @@ fun WeatherComponent(modifier: Modifier = Modifier, weather: Weather?) {
     }
 }
 
+/**
+ * Requests location permissions from the user.
+ *
+ * @param onPermissionGranted Callback to be invoked if all permissions are granted.
+ * @param onPermissionDenied Callback to be invoked if any permission is denied.
+ * @param onPermissionsRevoked Callback to be invoked if all permissions are revoked.
+ */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun RequestLocationPermission(

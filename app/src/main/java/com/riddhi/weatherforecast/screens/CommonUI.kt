@@ -10,6 +10,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
+/**
+ * Reusable component that displays a message related to API status.
+ */
 @Composable
 fun ApiStatusComponent(modifier: Modifier = Modifier, message: String) {
     Text(

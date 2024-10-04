@@ -3,13 +3,6 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.dagger.hilt.android)
-//    alias(libs.plugins.ksp)
-//    alias(libs.plugins.hilt)
-
-
-
-//    alias(libs.plugins.kotlin.kapt)
-    //id 'kotlin-kapt'
 }
 
 android {
@@ -72,21 +65,22 @@ dependencies {
 
     //hilt
     implementation(libs.hilt.android)
-//    implementation(libs.volley)
-//    kapt(libs.hilt.compiler)
+    implementation(libs.androidx.ui.test.junit4.android)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.junit.jupiter)
     kapt(libs.androidx.hilt.compiler)
-//    ksp(libs.hilt.compiler)
-//    kapt "com.google.dagger:hilt-android-compiler:2.28-alpha"
 
+    //preference
     implementation(libs.androidx.datastore.preferences)
 
+    //location and permission
     implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
 
+    //additional icons
     implementation( libs.androidx.material.icons.extended) // for full set (larger size)
 
     implementation (libs.androidx.core)
-
 
     //coroutines
     implementation(libs.kotlinx.coroutines.core)
@@ -101,15 +95,16 @@ dependencies {
     implementation (libs.androidx.hilt.navigation.compose)
 
     implementation(libs.coil.compose)
-    //implementation "com.google.dagger:hilt-android:2.50"
-    //kapt "com.google.dagger:hilt-compiler:2.50"
-
 
     testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation (libs.androidx.testing.junit4)
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

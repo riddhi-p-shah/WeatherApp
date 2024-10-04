@@ -19,30 +19,56 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
+/**
+ * ViewModel class responsible for fetching and managing weather data for the Home screen.
+ *
+ * @property weatherForecastRepository Repository for interacting with the weather API.
+ * @property dataStore DataStore instance for accessing stored user preferences.
+ * @property fusedLocationProviderClient class for accessing the user's location.
+ */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val weatherForecastRepository: WeatherForecastRepository,
     private val dataStore: DataStore, private val fusedLocationProviderClient: FusedLocationProviderClient
 ) : ViewModel() {
 
+    /**
+     * Mutable state flow representing the current state of the weather API request.
+     * Emits ApiStates to indicate loading, success, or error states.
+     */
     private val _weatherApiState = MutableStateFlow<ApiState>(ApiState.Loading)
     val weatherApiState: StateFlow<ApiState> = _weatherApiState.asStateFlow()
 
+    /**
+     * Boolean flag indicating whether location permission has been granted.
+     */
     var permissionGranted: Boolean = false
+
+    /**
+     * A pair of Double values representing the user's latitude and longitude
+     */
     private var locationPair: Pair<Double, Double>? = null
 
+    /**
+     * Mutable state flow to hold an error message
+     */
     val message = MutableStateFlow<String?>(null)
 
+    /**
+     * Fetches weather data based on the user's location or stored preferences.
+     * If no location data is available in preferences, it attempts to retrieve the user's current location.
+     */
     fun getWeather() {
         viewModelScope.launch(Dispatchers.IO) {
 
             val lat = dataStore.getDouble(Constants.LAT)
             val lon = dataStore.getDouble(Constants.LON)
 
-            //if there's no data in preference, then only.. it will search for the current location
+            // Prioritize using stored location data if available
             if (lat != null && lon != null) {
                 callWeatherApi(lat, lon)
             } else {
+                // If no stored location, try to get user's current location
                 locationPair?.let {
                     callWeatherApi(lat= it.first, lon = it.second)
                 }
@@ -50,6 +76,13 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Makes an API call to retrieve weather data for the given latitude and longitude.
+     * Updates the weather state and potential error messages within a coroutine.
+     *
+     * @param lat The user's latitude.
+     * @param lon The user's longitude.
+     */
     private fun callWeatherApi(lat: Double, lon: Double){
         viewModelScope.launch {
             try {
@@ -67,6 +100,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Attempts to retrieve the user's last known location if location permissions are granted.
+     */
     @SuppressLint("MissingPermission")
     fun getLastUserLocation() {
         // Check if location permissions are granted
